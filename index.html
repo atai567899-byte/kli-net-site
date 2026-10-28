@@ -160,7 +160,7 @@ function ready(){
     message('publicMsg','ספריית Supabase לא נטענה. בדוק חיבור לאינטרנט.',true);
     return false;
   }
-  if(SUPABASE_URL.includes('PASTE_') || SUPABASE_PUBLISHABLE_KEY.includes('PASTE_')){
+  if(SUPABASE_URL.includes('const SUPABASE_URL = 'https://fvtqcfkuouvlvzummsdu.supabase.co';') || SUPABASE_PUBLISHABLE_KEY.includes('sb_publishable_wSm_gL5Tis4mFM_OAjEcnw_31pHY9do')){
     message('publicMsg','צריך להגדיר את כתובת הפרויקט והמפתח הציבורי בקוד.',true);
     message('authMsg','צריך להגדיר את כתובת הפרויקט והמפתח הציבורי בקוד.',true);
     return false;
