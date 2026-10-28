@@ -270,22 +270,49 @@ async function bookPublic(){
   await loadPublicSlots();
 }
 
-async function login(){
-  if(!ready()) return;
-  const email=$('email').value.trim();
-  const password=$('password').value;
-  if(!email||!password){
-    message('authMsg','הזן אימייל וסיסמה.',true);
-    return;
-  }
+async function login() {
+  const authMsg = $('authMsg');
 
-  const {data,error}=await sb.auth.signInWithPassword({email,password});
-  if(error){
-    message('authMsg','ההתחברות נכשלה. בדוק אימייל וסיסמה.',true);
-    return;
+  try {
+    if (!ready()) return;
+
+    const email = $('email').value.trim();
+    const password = $('password').value;
+
+    if (!email || !password) {
+      message('authMsg', 'הזן אימייל וסיסמה.', true);
+      return;
+    }
+
+    const loginButton = $('loginBtn');
+    if (loginButton) loginButton.disabled = true;
+
+    message('authMsg', 'מתחבר...', false);
+
+    const { data, error } = await sb.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      message('authMsg', 'ההתחברות נכשלה: ' + error.message, true);
+      return;
+    }
+
+    currentUser = data.user;
+    await enterAdmin();
+
+  } catch (error) {
+    console.error('Login error:', error);
+    message(
+      'authMsg',
+      'שגיאה בהתחברות: ' + (error.message || 'שגיאה לא ידועה'),
+      true
+    );
+  } finally {
+    const loginButton = $('loginBtn');
+    if (loginButton) loginButton.disabled = false;
   }
-  currentUser=data.user;
-  await enterAdmin();
 }
 
 async function enterAdmin(){
