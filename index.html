@@ -140,14 +140,14 @@ th{background:#f8fafc}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 
-const SUPABASE_URL = "sb_publishable_wSm_gL5Tis4mFM_OAjEcnw_31pHY9do";
+const SUPABASE_URL = "https://fvtqcfkuouvlvzummsdu.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wSm_gL5Tis4mFM_OAjEcnw_31pHY9do";
 
 let sb = null;
 let selectedSlot = null;
 let currentUser = null;
-const $ = id => document.getElementById(id);
 
+const $ = id => document.getElementById(id);
 function message(id,text,error=false){
   const el=$(id);
   el.textContent=text;
