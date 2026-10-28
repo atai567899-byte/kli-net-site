@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#14213d">
+<title>כלי־נט | תורים וניהול ציוד</title>
+<style>
+:root{--navy:#14213d;--blue:#2457d6;--bg:#f3f6fb;--card:#fff;--text:#172033;--muted:#697386;--line:#e1e7f0;--green:#137a4b;--red:#b42318;--amber:#9a6700}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:11px 14px;font-weight:700}button:disabled{opacity:.45;cursor:not-allowed}.primary{background:var(--blue);color:white}.dark{background:var(--navy);color:white}.soft{background:#eaf0ff;color:#2149b6}.danger{background:#feeceb;color:var(--red)}.success{background:#e6f6ed;color:var(--green)}.outline{background:white;border:1px solid var(--line);color:var(--text)}header{background:var(--navy);color:#fff;padding:18px max(16px,calc((100vw - 1180px)/2));display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}header h1{font-size:22px;margin:0}header p{margin:5px 0 0;color:#c7d2e7;font-size:13px}.wrap{max-width:1180px;margin:22px auto;padding:0 16px}.tabs{display:flex;gap:8px;overflow:auto;padding-bottom:12px}.tab{white-space:nowrap;background:#e8edf6;color:#35415b}.tab.active{background:var(--blue);color:#fff}.panel{display:none}.panel.active{display:block}.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 3px 14px #16284a08;min-width:0}.span12{grid-column:span 12}.span8{grid-column:span 8}.span6{grid-column:span 6}.span4{grid-column:span 4}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.stat{background:white;border:1px solid var(--line);border-radius:14px;padding:16px}.stat strong{display:block;font-size:25px;margin-top:8px}.muted{color:var(--muted);font-size:13px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.between{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}h2{font-size:19px;margin:0 0 14px}h3{font-size:16px;margin:0 0 10px}.field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;min-width:0}.field label{font-size:13px;font-weight:700;color:#3b4558}input,select,textarea{width:100%;border:1px solid #cfd7e5;border-radius:9px;padding:11px;background:white;color:var(--text);min-width:0}textarea{resize:vertical;min-height:80px}input:focus,select:focus,textarea:focus{outline:2px solid #b8c9ff;border-color:var(--blue)}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}.full{grid-column:1/-1}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:650px}th,td{padding:11px 10px;text-align:right;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}th{background:#f7f9fc;color:#4b5567;font-weight:700}.badge{display:inline-block;border-radius:99px;padding:5px 8px;font-size:12px;font-weight:700;background:#edf1f7}.badge.green{background:#e6f6ed;color:var(--green)}.badge.red{background:#feeceb;color:var(--red)}.badge.amber{background:#fff4d6;color:var(--amber)}.checkrow{display:flex;gap:9px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}.checkrow input{width:18px;height:18px;margin-top:1px}.checkrow label{flex:1;line-height:1.4}.checkrow small{display:block;color:var(--muted);margin-top:3px}.empty{padding:24px;text-align:center;color:var(--muted)}.notice{padding:12px 14px;border-radius:10px;background:#fff6db;color:#6b4c00;font-size:13px;line-height:1.5;margin-bottom:14px}.oknotice{padding:12px 14px;border-radius:10px;background:#e8f7ee;color:#17613e;font-size:13px;line-height:1.5;margin-bottom:14px}.actions{display:flex;gap:6px;flex-wrap:wrap}.smallbtn{padding:7px 9px;font-size:12px}.divider{height:1px;background:var(--line);margin:14px 0}.footer{text-align:center;color:var(--muted);font-size:12px;padding:24px}.hidden{display:none!important}.slotgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}.slot{border:1px solid var(--line);background:white;color:var(--text)}.slot.selected{background:var(--blue);color:white;border-color:var(--blue)}.slot.taken{background:#edf0f5;color:#9299a6;text-decoration:line-through;cursor:not-allowed}
+@media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}.span8,.span6,.span4{grid-column:span 12}.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.wrap{margin-top:14px}.card{padding:14px}header{padding:15px 16px}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>🧰 כלי־נט</h1><p>ניהול תורים, בדיקות ציוד והשאלות</p></div>
+  <div class="row"><button class="outline" onclick="exportData()">ייצוא גיבוי</button><button class="outline" onclick="document.getElementById('importFile').click()">שחזור גיבוי</button><input id="importFile" type="file" accept="application/json" class="hidden" onchange="importData(event)"></div>
+</header>
+<main class="wrap">
+  <div class="notice"><b>חשוב:</b> זו גרסה עצמאית ששומרת נתונים בדפדפן במכשיר הזה. אין להזין מידע מסווג, פרטים מבצעיים או מידע שאסור לשמור במערכת חיצונית. כדי שתזכורות וואטסאפ יישלחו אוטומטית כשהאתר סגור, נדרש חיבור שרת ל־WhatsApp Business Platform; כאן אפשר לפתוח הודעה מוכנה לשליחה.</div>
+  <nav class="tabs">
+    <button class="tab active" data-tab="dashboard">סקירה</button>
+    <button class="tab" data-tab="booking">קביעת תור</button>
+    <button class="tab" data-tab="appointments">ניהול תורים</button>
+    <button class="tab" data-tab="checklist">צ׳ק־ליסט בדיקה</button>
+    <button class="tab" data-tab="tools">ניהול כלים</button>
+    <button class="tab" data-tab="settings">זמינות והגדרות</button>
+  </nav>
+
+  <section id="dashboard" class="panel active">
+    <div class="stats">
+      <div class="stat"><span class="muted">תורים פתוחים</span><strong id="statAppointments">0</strong></div>
+      <div class="stat"><span class="muted">טיפולים פתוחים</span><strong id="statTreatments">0</strong></div>
+      <div class="stat"><span class="muted">כלים בהשאלה</span><strong id="statBorrowed">0</strong></div>
+      <div class="stat"><span class="muted">כלים תקולים</span><strong id="statBroken">0</strong></div>
+    </div>
+    <div class="grid">
+      <div class="card span8"><div class="between"><h2>התורים הקרובים</h2><button class="soft" onclick="showTab('appointments')">לכל התורים</button></div><div id="upcoming"></div></div>
+      <div class="card span4"><h2>קיצור דרך</h2><div class="row"><button class="primary" onclick="showTab('booking')">＋ קביעת תור</button><button class="outline" onclick="showTab('checklist')">בדיקת ציוד</button><button class="outline" onclick="showTab('tools')">רישום כלי</button></div><div class="divider"></div><p class="muted">טיפ: ייצא גיבוי מדי פעם. הנתונים נשמרים במכשיר ובדפדפן שבו פתחת את האתר.</p></div>
+    </div>
+  </section>
+
+  <section id="booking" class="panel">
+    <div class="grid">
+      <div class="card span6">
+        <h2>קביעת תור</h2>
+        <form id="bookingForm">
+          <div class="formgrid">
+            <div class="field"><label for="bName">שם החייל / הלקוח *</label><input id="bName" required maxlength="100"></div>
+            <div class="field"><label for="bPhone">טלפון לוואטסאפ *</label><input id="bPhone" required placeholder="05XXXXXXXX" inputmode="tel"></div>
+            <div class="field"><label for="bDate">תאריך *</label><input id="bDate" type="date" required></div>
+            <div class="field"><label for="bType">סוג פנייה</label><select id="bType"><option>השאלת כלי</option><option>החזרת כלי</option><option>בדיקת ציוד</option><option>תיקון / טיפול</option><option>אחר</option></select></div>
+            <div class="field full"><label>שעה פנויה *</label><div id="slots" class="slotgrid"><span class="muted">בחר תאריך כדי לראות שעות פנויות</span></div><input id="bTime" type="hidden" required></div>
+            <div class="field full"><label for="bNotes">הערות לטיפול</label><textarea id="bNotes" placeholder="פרטים כלליים בלבד — ללא מידע מסווג"></textarea></div>
+          </div>
+          <button class="primary" type="submit">שמירת התור</button>
+        </form>
+      </div>
+      <div class="card span6"><h2>שעות פעילות</h2><p id="availabilitySummary" class="muted"></p><div class="notice">רק שעות שסומנו כפנויות בהגדרות יוצגו לבחירה. לאחר שמירת התור, השעה תיתפס ולא תופיע לאחרים באותו דפדפן.</div><h3>שיתוף קישור לקביעת תור</h3><p class="muted">לאחר פרסום קובץ האתר באחסון אינטרנטי, אפשר לשלוח את כתובת האתר לחיילים.</p><button class="outline" onclick="copyPageLink()">העתקת כתובת האתר</button></div>
+    </div>
+  </section>
+
+  <section id="appointments" class="panel">
+    <div class="card">
+      <div class="between"><h2>ניהול תורים וטיפולים</h2><div class="row"><select id="appointmentFilter" onchange="renderAppointments()" style="width:auto"><option value="all">הכול</option><option value="open">פתוחים</option><option value="closed">סגורים</option><option value="cancelled">בוטלו</option></select><button class="primary" onclick="showTab('booking')">＋ תור חדש</button></div></div>
+      <div class="tablewrap" id="appointmentsTable"></div>
+    </div>
+  </section>
+
+  <section id="checklist" class="panel">
+    <div class="grid">
+      <div class="card span6">
+        <h2>צ׳ק־ליסט בדיקת ציוד</h2>
+        <p class="muted">תבנית כללית להמחשה. יש להתאים את סעיפי הבדיקה לנוהל המאושר של היחידה.</p>
+        <form id="checkForm">
+          <div class="field"><label for="cName">שם מבצע הבדיקה</label><input id="cName" maxlength="100"></div>
+          <div class="field"><label for="cItem">שם / סוג הכלי</label><input id="cItem" required maxlength="100"></div>
+          <div class="field"><label for="cDate">תאריך בדיקה</label><input id="cDate" type="date" required></div>
+          <div id="checkItems"></div>
+          <div class="field"><label for="cResult">תוצאה כללית</label><select id="cResult"><option>תקין</option><option>לא תקין — נדרש טיפול</option><option>ממתין לבדיקה נוספת</option></select></div>
+          <div class="field"><label for="cFault">פירוט תקלה / הערות</label><textarea id="cFault" placeholder="תיאור כללי בלבד"></textarea></div>
+          <button class="primary" type="submit">שמירת בדיקה</button>
+        </form>
+      </div>
+      <div class="card span6"><h2>בדיקות שנשמרו</h2><div id="checksSaved"></div></div>
+    </div>
+  </section>
+
+  <section id="tools" class="panel">
+    <div class="grid">
+      <div class="card span6">
+        <h2>רישום השאלה / החזרת כלי</h2>
+        <form id="toolForm">
+          <div class="formgrid">
+            <div class="field"><label for="tName">שם החייל / הלקוח *</label><input id="tName" required maxlength="100"></div>
+            <div class="field"><label for="tPhone">טלפון</label><input id="tPhone" inputmode="tel" placeholder="05XXXXXXXX"></div>
+            <div class="field"><label for="tItem">שם / סוג הכלי *</label><input id="tItem" required maxlength="100"></div>
+            <div class="field"><label for="tId">מספר זיהוי פנימי (לא מסווג)</label><input id="tId" maxlength="50"></div>
+            <div class="field full"><label for="tReason">סיבת ההשאלה *</label><textarea id="tReason" required maxlength="500"></textarea></div>
+            <div class="field"><label for="tDate">תאריך השאלה</label><input id="tDate" type="date" required></div>
+            <div class="field"><label for="tDue">תאריך החזרה מתוכנן</label><input id="tDue" type="date"></div>
+            <div class="field"><label for="tCondition">מצב הכלי</label><select id="tCondition"><option>תקין</option><option>תקול</option><option>ממתין לבדיקה</option></select></div>
+            <div class="field"><label for="tNotes">הערות</label><input id="tNotes" maxlength="300"></div>
+          </div>
+          <button class="primary" type="submit">רישום השאלה</button>
+        </form>
+      </div>
+      <div class="card span6"><h2>ציוד בהשאלה / היסטוריה</h2><div id="toolsTable"></div></div>
+    </div>
+  </section>
+
+  <section id="settings" class="panel">
+    <div class="grid">
+      <div class="card span6">
+        <h2>הגדרת זמינות</h2>
+        <form id="settingsForm">
+          <div class="field"><label for="sDays">ימים פעילים</label><div class="row" id="daysChecks"></div></div>
+          <div class="formgrid">
+            <div class="field"><label for="sStart">שעת התחלה</label><input id="sStart" type="time" required></div>
+            <div class="field"><label for="sEnd">שעת סיום</label><input id="sEnd" type="time" required></div>
+            <div class="field"><label for="sDuration">משך תור בדקות</label><select id="sDuration"><option>15</option><option>20</option><option selected>30</option><option>45</option><option>60</option><option>90</option></select></div>
+            <div class="field"><label for="sGap">מרווח בין תורים בדקות</label><select id="sGap"><option>0</option><option>5</option><option>10</option><option>15</option></select></div>
+          </div>
+          <button class="primary" type="submit">שמירת זמינות</button>
+        </form>
+      </div>
+      <div class="card span6">
+        <h2>הגדרות תזכורות וואטסאפ</h2>
+        <div class="oknotice">הודעות נפתחות עם טקסט מוכן. כדי לשלוח אוטומטית יום לפני ושלוש שעות לפני, האתר חייב שרת מתוזמן וחיבור WhatsApp Business API מאומת.</div>
+        <div class="field"><label for="sBusiness">שם העסק / המדור שיופיע בהודעה</label><input id="sBusiness" maxlength="100" placeholder="למשל: מדור ציוד"></div>
+        <button class="primary" onclick="saveBusiness()">שמירת שם</button>
+        <div class="divider"></div>
+        <h3>גיבוי נתונים</h3><p class="muted">הנתונים לא מסתנכרנים בין מכשירים. ייצא גיבוי כדי להעביר אותם למכשיר אחר.</p><button class="outline" onclick="exportData()">הורדת קובץ גיבוי</button>
+      </div>
+    </div>
+  </section>
+  <div class="footer">כלי־נט · אבטיפוס מקומי · אין להזין מידע מסווג או רגיש</div>
+</main>
+<script>
+const KEY='kli_net_v1';
+const defaultData={appointments:[],checks:[],tools:[],settings:{days:[0,1,2,3,4],start:'08:00',end:'16:00',duration:30,gap:0,business:'מדור ציוד'}};
+let data=loadData();
+const checklistItems=[
+ ['מנחים / מסמכים נדרשים קיימים','בדיקה כללית של מסמכים מאושרים'],
+ ['קיימת רשימת כלים','התאמה לרשימה המורשית'],
+ ['כל קצה / חיבור מחובר ליחידה המתאימה','בדיקה חזותית כללית'],
+ ['כלים נקיים','בדיקה חזותית'],
+ ['כלים מאוחסנים בצורה בטוחה','בדיקת אחסון'],
+ ['בדיקת שמנים / נזילות לפי נוהל מאושר','רק אם רלוונטי לכלי'],
+ ['בדיקת טעינה / חיבורים לפי נוהל מאושר','רק אם רלוונטי לכלי'],
+ ['כלים מונחים על משטח יציב','בדיקת יציבות'],
+ ['הציוד שמור ומוגן','בדיקה כללית'],
+ ['דווח על כלים תקולים','לתעד תקלה ולבודד כלי לא תקין לפי הנוהל']
+];
+function loadData(){try{return {...structuredClone(defaultData),...JSON.parse(localStorage.getItem(KEY)||'{}'),settings:{...defaultData.settings,...(JSON.parse(localStorage.getItem(KEY)||'{}').settings||{})}}}catch(e){return structuredClone(defaultData)}}
+function save(){localStorage.setItem(KEY,JSON.stringify(data));renderAll()}
+function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function dateToday(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function fmtDate(s){if(!s)return '—';let [y,m,d]=s.split('-');return `${d}/${m}/${y}`}
+function showTab(name){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===name));if(name==='booking')renderSlots();if(name==='appointments')renderAppointments();if(name==='tools')renderTools();if(name==='checklist')renderChecks()}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+function init(){
+ const today=dateToday();['bDate','cDate','tDate'].forEach(x=>document.getElementById(x).min=today);document.getElementById('cDate').value=today;document.getElementById('tDate').value=today;document.getElementById('bDate').min=today;
+ document.getElementById('bDate').addEventListener('change',renderSlots);
+ document.getElementById('daysChecks').innerHTML=['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'].map((n,i)=>`<label style="display:flex;gap:5px;align-items:center"><input style="width:auto" type="checkbox" value="${i}" class="dayCheck">${n}</label>`).join('');
+ document.getElementById('checkItems').innerHTML=checklistItems.map((it,i)=>`<div class="checkrow"><input type="checkbox" id="ci${i}"><label for="ci${i}">${esc(it[0])}<small>${esc(it[1])}</small></label></div>`).join('');
+ fillSettings();document.getElementById('sBusiness').value=data.settings.business||'מדור ציוד';document.getElementById('availabilitySummary').textContent=availabilityText();
+ document.getElementById('bookingForm').addEventListener('submit',bookAppointment);
+ document.getElementById('checkForm').addEventListener('submit',saveCheck);
+ document.getElementById('toolForm').addEventListener('submit',saveTool);
+ document.getElementById('settingsForm').addEventListener('submit',saveSettings);
+ renderAll();
+}
+function fillSettings(){document.getElementById('sStart').value=data.settings.start;document.getElementById('sEnd').value=data.settings.end;document.getElementById('sDuration').value=data.settings.duration;document.getElementById('sGap').value=data.settings.gap;document.querySelectorAll('.dayCheck').forEach(c=>c.checked=data.settings.days.includes(Number(c.value)))}
+function availabilityText(){let names=['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];return `ימים: ${data.settings.days.map(d=>names[d]).join(', ')||'לא הוגדרו'} · ${data.settings.start}–${data.settings.end} · משך תור: ${data.settings.duration} דקות`}
+function saveSettings(e){e.preventDefault();let days=[...document.querySelectorAll('.dayCheck:checked')].map(c=>Number(c.value));let start=document.getElementById('sStart').value,end=document.getElementById('sEnd').value;if(!days.length)return alert('בחר לפחות יום אחד');if(start>=end)return alert('שעת הסיום חייבת להיות אחרי שעת ההתחלה');data.settings={...data.settings,days,start,end,duration:Number(document.getElementById('sDuration').value),gap:Number(document.getElementById('sGap').value)};save();document.getElementById('availabilitySummary').textContent=availabilityText();alert('הזמינות נשמרה')}
+function saveBusiness(){data.settings.business=document.getElementById('sBusiness').value.trim()||'מדור ציוד';save();alert('השם נשמר')}
+function timeToMins(t){let [h,m]=t.split(':').map(Number);return h*60+m}
+function minsToTime(n){return `${String(Math.floor(n/60)).padStart(2,'0')}:${String(n%60).padStart(2,'0')}`}
+function renderSlots(){let date=document.getElementById('bDate').value,box=document.getElementById('slots');document.getElementById('bTime').value='';if(!date){box.innerHTML='<span class="muted">בחר תאריך כדי לראות שעות פנויות</span>';return}let weekday=new Date(date+'T12:00:00').getDay();if(!data.settings.days.includes(weekday)){box.innerHTML='<span class="muted">אין קבלת קהל ביום זה. בחר יום אחר.</span>';return}let start=timeToMins(data.settings.start),end=timeToMins(data.settings.end),step=Number(data.settings.duration)+Number(data.settings.gap),now=new Date();let times=[];for(let m=start;m+Number(data.settings.duration)<=end;m+=step){let time=minsToTime(m);let taken=data.appointments.some(a=>a.date===date&&a.time===time&&a.status!=='cancelled');let past=date===dateToday()&&m<=now.getHours()*60+now.getMinutes();times.push({time,taken,past})}box.innerHTML=times.length?times.map(t=>`<button type="button" class="slot ${t.taken||t.past?'taken':''}" ${t.taken||t.past?'disabled':''} onclick="selectSlot('${t.time}',this)">${t.time}${t.taken?' · תפוס':t.past?' · עבר':''}</button>`).join(''):'<span class="muted">אין שעות זמינות בתאריך זה</span>'}
+function selectSlot(t,el){document.getElementById('bTime').value=t;document.querySelectorAll('.slot').forEach(x=>x.classList.remove('selected'));el.classList.add('selected')}
+function bookAppointment(e){e.preventDefault();let name=document.getElementById('bName').value.trim(),phone=document.getElementById('bPhone').value.trim(),date=document.getElementById('bDate').value,time=document.getElementById('bTime').value;if(!time)return alert('בחר שעה פנויה');if(data.appointments.some(a=>a.date===date&&a.time===time&&a.status!=='cancelled'))return alert('השעה כבר נתפסה, בחר שעה אחרת');let a={id:id(),name,phone,date,time,type:document.getElementById('bType').value,notes:document.getElementById('bNotes').value.trim(),status:'open',created:new Date().toISOString(),checklistId:null};data.appointments.push(a);save();e.target.reset();document.getElementById('bTime').value='';document.getElementById('bDate').min=dateToday();renderSlots();alert('התור נשמר בהצלחה');showTab('appointments')}
+function statusBadge(s){return s==='closed'?'<span class="badge green">נסגר</span>':s==='cancelled'?'<span class="badge red">בוטל</span>':'<span class="badge amber">פתוח</span>'}
+function renderAppointments(){let f=document.getElementById('appointmentFilter')?.value||'all';let list=[...data.appointments].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).filter(a=>f==='all'||(f==='open'&&a.status==='open')||(f==='closed'&&a.status==='closed')||(f==='cancelled'&&a.status==='cancelled'));let el=document.getElementById('appointmentsTable');if(!list.length){el.innerHTML='<div class="empty">אין תורים להצגה</div>';return}el.innerHTML=`<table><thead><tr><th>תאריך ושעה</th><th>שם וטלפון</th><th>סוג פנייה</th><th>הערות</th><th>מצב</th><th>פעולות</th></tr></thead><tbody>${list.map(a=>`<tr><td>${fmtDate(a.date)}<br><b>${esc(a.time)}</b></td><td>${esc(a.name)}<br><span class="muted">${esc(a.phone)}</span></td><td>${esc(a.type)}</td><td>${esc(a.notes||'—')}</td><td>${statusBadge(a.status)}</td><td><div class="actions">${a.status==='open'?`<button class="success smallbtn" onclick="closeAppointment('${a.id}')">סגור טיפול</button><button class="soft smallbtn" onclick="waReminder('${a.id}','day')">וואטסאפ יום לפני</button><button class="soft smallbtn" onclick="waReminder('${a.id}','three')">וואטסאפ 3 שעות לפני</button><button class="outline smallbtn" onclick="waReminder('${a.id}','confirm')">אישור תור</button><button class="danger smallbtn" onclick="cancelAppointment('${a.id}')">ביטול</button>`:''}<button class="outline smallbtn" onclick="editNotes('${a.id}')">עריכת הערות</button><button class="danger smallbtn" onclick="deleteAppointment('${a.id}')">מחיקה</button></div></td></tr>`).join('')}</tbody></table>`}
+function closeAppointment(idv){let a=data.appointments.find(x=>x.id===idv);if(!a)return;if(!confirm('לסגור את הטיפול? יש לוודא שהציוד הוחזר אם הושאל.'))return;a.status='closed';a.closedAt=new Date().toISOString();save();renderAppointments()}
+function cancelAppointment(idv){let a=data.appointments.find(x=>x.id===idv);if(a&&confirm('לבטל את התור?')){a.status='cancelled';save()}}
+function deleteAppointment(idv){if(confirm('למחוק את התור לצמיתות מהדפדפן?')){data.appointments=data.appointments.filter(x=>x.id!==idv);save()}}
+function editNotes(idv){let a=data.appointments.find(x=>x.id===idv);if(!a)return;let n=prompt('הערות לטיפול:',a.notes||'');if(n!==null){a.notes=n;save()}}
+function waReminder(idv,kind){let a=data.appointments.find(x=>x.id===idv);if(!a)return;let phone=a.phone.replace(/\D/g,'');if(phone.startsWith('0'))phone='972'+phone.slice(1);if(!phone)return alert('אין מספר טלפון תקין');let when=kind==='day'?'תזכורת ליום שלפני התור':kind==='three'?'תזכורת 3 שעות לפני התור':'אישור קביעת תור';let msg=kind==='confirm'?`שלום ${a.name}, התור שלך נקבע ל-${fmtDate(a.date)} בשעה ${a.time} (${a.type}). ${data.settings.business}.`:`שלום ${a.name}, ${when}: התור שלך בתאריך ${fmtDate(a.date)} בשעה ${a.time}. סוג פנייה: ${a.type}. ${data.settings.business}. אם צריך לשנות או לבטל, נא ליצור קשר.`;window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank','noopener')}
+function renderChecks(){let el=document.getElementById('checksSaved');if(!data.checks.length){el.innerHTML='<div class="empty">עדיין לא נשמרו בדיקות</div>';return}el.innerHTML=[...data.checks].reverse().map(c=>`<div class="card" style="padding:13px;margin-bottom:10px"><div class="between"><b>${esc(c.item)}</b><span class="badge ${c.result==='תקין'?'green':c.result.startsWith('לא תקין')?'red':'amber'}">${esc(c.result)}</span></div><p class="muted">${fmtDate(c.date)} · ${esc(c.by||'ללא שם')}</p><p style="font-size:13px">${c.checked.filter(Boolean).length}/${c.checked.length} סעיפים סומנו</p>${c.fault?`<p>${esc(c.fault)}</p>`:''}<button class="danger smallbtn" onclick="deleteCheck('${c.id}')">מחיקת בדיקה</button></div>`).join('')}
+function saveCheck(e){e.preventDefault();let checked=checklistItems.map((_,i)=>document.getElementById('ci'+i).checked);let c={id:id(),by:document.getElementById('cName').value.trim(),item:document.getElementById('cItem').value.trim(),date:document.getElementById('cDate').value,result:document.getElementById('cResult').value,fault:document.getElementById('cFault').value.trim(),checked};data.checks.push(c);save();e.target.reset();document.getElementById('cDate').value=dateToday();alert('הבדיקה נשמרה')}
+function deleteCheck(idv){if(confirm('למחוק את הבדיקה?')){data.checks=data.checks.filter(c=>c.id!==idv);save()}}
+function saveTool(e){e.preventDefault();let t={id:id(),name:document.getElementById('tName').value.trim(),phone:document.getElementById('tPhone').value.trim(),item:document.getElementById('tItem').value.trim(),itemId:document.getElementById('tId').value.trim(),reason:document.getElementById('tReason').value.trim(),date:document.getElementById('tDate').value,due:document.getElementById('tDue').value,condition:document.getElementById('tCondition').value,notes:document.getElementById('tNotes').value.trim(),status:'borrowed'};data.tools.push(t);save();e.target.reset();document.getElementById('tDate').value=dateToday();alert('ההשאלה נשמרה')}
+function returnTool(idv){let t=data.tools.find(x=>x.id===idv);if(t&&confirm('לאשר שהכלי הוחזר ולסגור את ההשאלה?')){t.status='returned';t.returnedAt=dateToday();save()}}
+function renderTools(){let el=document.getElementById('toolsTable');if(!data.tools.length){el.innerHTML='<div class="empty">אין כלים רשומים</div>';return}el.innerHTML=`<div class="tablewrap"><table><thead><tr><th>כלי / מזהה</th><th>נלקח על ידי</th><th>סיבה</th><th>תאריכים</th><th>מצב</th><th>פעולה</th></tr></thead><tbody>${[...data.tools].reverse().map(t=>`<tr><td><b>${esc(t.item)}</b><br><span class="muted">${esc(t.itemId||'')}</span></td><td>${esc(t.name)}<br><span class="muted">${esc(t.phone||'')}</span></td><td>${esc(t.reason)}${t.notes?'<br>'+esc(t.notes):''}</td><td>השאלה: ${fmtDate(t.date)}<br>החזרה: ${fmtDate(t.due)}${t.returnedAt?'<br>הוחזר: '+fmtDate(t.returnedAt):''}</td><td>${t.status==='returned'?'<span class="badge green">הוחזר</span>':t.condition==='תקול'?'<span class="badge red">תקול</span>':'<span class="badge amber">בהשאלה</span>'}<br><span class="muted">${esc(t.condition)}</span></td><td>${t.status==='borrowed'?`<button class="success smallbtn" onclick="returnTool('${t.id}')">הכלי הוחזר</button>`:''}<button class="danger smallbtn" onclick="deleteTool('${t.id}')">מחיקה</button></td></tr>`).join('')}</tbody></table></div>`}
+function deleteTool(idv){if(confirm('למחוק את הרישום?')){data.tools=data.tools.filter(t=>t.id!==idv);save()}}
+function renderDashboard(){let open=data.appointments.filter(a=>a.status==='open');document.getElementById('statAppointments').textContent=open.length;document.getElementById('statTreatments').textContent=open.length;document.getElementById('statBorrowed').textContent=data.tools.filter(t=>t.status==='borrowed').length;document.getElementById('statBroken').textContent=data.tools.filter(t=>t.condition==='תקול'&&t.status!=='returned').length;let upcoming=document.getElementById('upcoming');let list=open.filter(a=>a.date>=dateToday()).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).slice(0,8);upcoming.innerHTML=list.length?`<div class="tablewrap"><table><thead><tr><th>מועד</th><th>שם</th><th>סוג</th><th>מצב</th></tr></thead><tbody>${list.map(a=>`<tr><td>${fmtDate(a.date)} · ${esc(a.time)}</td><td>${esc(a.name)}</td><td>${esc(a.type)}</td><td>${statusBadge(a.status)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">אין תורים קרובים כרגע</div>'}
+function renderAll(){renderDashboard();renderAppointments();renderTools();renderChecks();document.getElementById('availabilitySummary').textContent=availabilityText()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='kli-net-backup-'+dateToday()+'.json';a.click();URL.revokeObjectURL(url)}
+function importData(e){let file=e.target.files[0];if(!file)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!d.appointments||!d.settings)throw Error();if(!confirm('שחזור יחליף את הנתונים בדפדפן. להמשיך?'))return;data={...structuredClone(defaultData),...d,settings:{...defaultData.settings,...d.settings}};save();fillSettings();alert('הגיבוי שוחזר')}catch(err){alert('קובץ גיבוי לא תקין')}e.target.value=''};r.readAsText(file)}
+async function copyPageLink(){try{await navigator.clipboard.writeText(location.href);alert('הכתובת הועתקה')}catch(e){prompt('העתק את הכתובת:',location.href)}}
+init();
+</script>
+</body>
+</html>
