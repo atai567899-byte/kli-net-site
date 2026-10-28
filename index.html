@@ -155,18 +155,31 @@ function message(id,text,error=false){
   el.classList.add(error?'error':'success');
 }
 
-function ready(){
-  if(!window.supabase){
-    message('publicMsg','ספריית Supabase לא נטענה. בדוק חיבור לאינטרנט.',true);
+function ready() {
+  if (!window.supabase) {
+    message('publicMsg', 'ספריית Supabase לא נטענה.', true);
+    message('authMsg', 'ספריית Supabase לא נטענה.', true);
     return false;
   }
-  if(SUPABASE_URL.includes('const SUPABASE_URL = 'https://fvtqcfkuouvlvzummsdu.supabase.co';') || SUPABASE_PUBLISHABLE_KEY.includes('sb_publishable_wSm_gL5Tis4mFM_OAjEcnw_31pHY9do')){
-    message('publicMsg','צריך להגדיר את כתובת הפרויקט והמפתח הציבורי בקוד.',true);
-    message('authMsg','צריך להגדיר את כתובת הפרויקט והמפתח הציבורי בקוד.',true);
+
+  if (
+    !SUPABASE_URL.startsWith('https://') ||
+    !SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_')
+  ) {
+    message('publicMsg', 'כתובת הפרויקט או המפתח הציבורי אינם תקינים.', true);
+    message('authMsg', 'כתובת הפרויקט או המפתח הציבורי אינם תקינים.', true);
     return false;
   }
-  if(!sb) sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+
+  if (!sb) {
+    sb = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+  }
+
   return true;
+}
 }
 
 function pretty(iso){
