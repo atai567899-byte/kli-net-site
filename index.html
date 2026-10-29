@@ -162,10 +162,7 @@ function ready() {
     return false;
   }
 
-  if (
-    !SUPABASE_URL.startsWith('https://') ||
-    !SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_')
-  ) {
+  if (!SUPABASE_URL.startsWith('https://') || !SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_')) {
     message('publicMsg', 'כתובת הפרויקט או המפתח הציבורי אינם תקינים.', true);
     message('authMsg', 'כתובת הפרויקט או המפתח הציבורי אינם תקינים.', true);
     return false;
