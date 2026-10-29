@@ -3,139 +3,120 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>כלי-נט | ניהול תורים וציוד</title>
+<title>כלי-נט | רישום לקיחת כלים</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f3f6fb;color:#172033}
 header{background:#12315a;color:white;padding:20px}
-.wrap{max-width:1000px;margin:20px auto;padding:0 14px}
+.wrap{max-width:900px;margin:22px auto;padding:0 14px}
 .card{background:white;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 3px 16px #142b4b0d}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 label{display:block;font-weight:bold;margin:10px 0 5px}
 input,select,textarea,button{font:inherit}
 input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:9px}
-textarea{min-height:70px}
+textarea{min-height:85px}
 button{border:0;border-radius:9px;padding:11px 15px;background:#1763bd;color:white;cursor:pointer;font-weight:bold;margin-top:12px}
-button:disabled{opacity:.55;cursor:wait}
-button.secondary{background:#e6edf6;color:#17324f}
-button.danger{background:#b42318}
+button:disabled{opacity:.6;cursor:wait}
+.secondary{background:#e6edf6;color:#17324f}
+.danger{background:#b42318}
 .hidden{display:none!important}
 .muted{color:#64748b;font-size:14px}
 .notice{padding:11px;border-radius:9px;background:#eef6ff;margin:10px 0}
 .error{background:#fff0f0;color:#9f1c1c}
 .success{background:#eaf8ef;color:#176638}
-.slot-list{display:flex;gap:8px;flex-wrap:wrap}
-.slot{margin:0;background:#edf4ff;color:#174c8b;border:1px solid #b9d5fa}
-.slot.selected{background:#1763bd;color:white}
-.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
-.tabs button{margin:0}
-.tabs button.active{background:#0e2340}
-.item{border:1px solid #e2e8f0;padding:12px;border-radius:10px;margin:8px 0}
-.item strong{display:block;margin-bottom:5px}
+.item{border:1px solid #e2e8f0;padding:14px;border-radius:10px;margin:10px 0}
+.item strong{display:block;margin-bottom:7px}
 .toprow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.tablewrap{overflow:auto}
-table{width:100%;border-collapse:collapse}
-th,td{text-align:right;padding:9px;border-bottom:1px solid #e5eaf0}
-th{background:#f8fafc}
-.small{font-size:13px}
-@media(max-width:600px){.card{padding:14px}th,td{padding:7px;font-size:14px}}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs button{margin:0}
+.active{background:#0e2340}
+@media(max-width:600px){.card{padding:14px}}
 </style>
 </head>
 <body>
 <header>
   <h1>כלי-נט</h1>
-  <p>קביעת תורים וניהול ציוד</p>
+  <p>רישום לקיחת כלים ומעקב אחר רישומים פתוחים</p>
 </header>
 
 <div class="wrap">
 
 <section class="card">
-<h2>קביעת תור</h2>
-<p class="muted">אין צורך להתחבר. אפשר לראות רק שעות פנויות.</p>
-<div id="publicMsg" class="notice hidden"></div>
+  <h2>טופס רישום לקיחת כלי</h2>
+  <p class="muted">מלא את הפרטים בעת לקיחת כלי.</p>
+  <div id="publicMsg" class="notice hidden"></div>
 
-<div class="grid">
-  <div><label for="pName">שם מלא</label><input id="pName" maxlength="100"></div>
-  <div><label for="pPhone">טלפון</label><input id="pPhone" maxlength="30"></div>
-  <div><label for="pDate">תאריך</label><input id="pDate" type="date"></div>
-  <div><label for="pType">סוג התור</label><input id="pType" maxlength="100" placeholder="לדוגמה: קבלת ציוד"></div>
-</div>
+  <label for="tool">מספר הכלי</label>
+  <select id="tool">
+    <option value="">טוען ציוד...</option>
+  </select>
 
-<label>שעות פנויות</label>
-<div id="slots" class="slot-list muted">בחר תאריך כדי לראות שעות פנויות.</div>
+  <div class="grid">
+    <div>
+      <label for="borrower">שם הלוקח</label>
+      <input id="borrower" maxlength="100" required>
+    </div>
+    <div>
+      <label for="phone">טלפון (לא חובה)</label>
+      <input id="phone" maxlength="30">
+    </div>
+    <div>
+      <label for="due">תאריך החזרה מתוכנן (לא חובה)</label>
+      <input id="due" type="date">
+    </div>
+  </div>
 
-<label for="pNotes">הערה (לא חובה)</label>
-<textarea id="pNotes" maxlength="500"></textarea>
-<button id="bookBtn" onclick="bookPublic()">קביעת תור</button>
+  <label for="note">הערה</label>
+  <textarea id="note" maxlength="500"
+    placeholder="לדוגמה: נלקח כלי זה מספר 72636382"></textarea>
+
+  <button id="submitBtn" onclick="submitLoan()">רישום לקיחת כלי</button>
 </section>
 
 <section class="card">
-<div class="toprow">
-  <div><h2 style="margin:0">כניסת מנהל</h2><p class="muted">התחברות באמצעות אימייל וסיסמה.</p></div>
-  <button class="secondary" id="logoutBtn" onclick="logout()" style="display:none">התנתקות</button>
-</div>
-<div id="authMsg" class="notice hidden"></div>
-<div id="loginBox" class="grid">
-  <div><label for="email">אימייל מנהל</label><input id="email" type="email" autocomplete="username"></div>
-  <div><label for="password">סיסמה</label><input id="password" type="password" autocomplete="current-password"></div>
-</div>
-<button id="loginBtn" onclick="login()">כניסה לניהול</button>
+  <div class="toprow">
+    <div>
+      <h2>כניסת מנהל</h2>
+      <p class="muted">צפייה ברישומים פתוחים וסגירתם.</p>
+    </div>
+    <button id="logoutBtn" class="secondary hidden" onclick="logout()">התנתקות</button>
+  </div>
+
+  <div id="authMsg" class="notice hidden"></div>
+  <div id="loginBox" class="grid">
+    <div>
+      <label for="email">אימייל מנהל</label>
+      <input id="email" type="email" autocomplete="username">
+    </div>
+    <div>
+      <label for="password">סיסמה</label>
+      <input id="password" type="password" autocomplete="current-password">
+    </div>
+  </div>
+  <button id="loginBtn" onclick="login()">כניסה לניהול</button>
+
+  <div id="adminArea" class="hidden">
+    <hr>
+    <div class="toprow">
+      <h2>רישומים פתוחים</h2>
+      <button class="secondary" onclick="loadLoans()">רענון</button>
+    </div>
+    <div id="loansList">טוען...</div>
+
+    <h2>היסטוריית רישומים סגורים</h2>
+    <button class="secondary" onclick="loadHistory()">רענון היסטוריה</button>
+    <div id="historyList"></div>
+
+    <h2>הוספת כלי למלאי</h2>
+    <label for="newTool">שם הכלי</label>
+    <input id="newTool" maxlength="120" placeholder="שם הכלי">
+    <label for="newCode">מספר מזהה</label>
+    <input id="newCode" maxlength="80" placeholder="לדוגמה: 72636382">
+    <button onclick="addTool()">שמירת כלי</button>
+  </div>
 </section>
 
-<section id="adminArea" class="hidden">
-<div class="tabs">
-  <button class="active" data-tab="appointments" onclick="showTab('appointments')">תורים</button>
-  <button class="secondary" data-tab="availability" onclick="showTab('availability')">שעות פנויות</button>
-  <button class="secondary" data-tab="tools" onclick="showTab('tools')">ציוד והשאלות</button>
-  <button class="secondary" data-tab="checks" onclick="showTab('checks')">רשימת בדיקה</button>
-</div>
-
-<section id="tab-appointments" class="card">
-<div class="toprow"><h2>ניהול תורים</h2><button class="secondary" onclick="loadAppointments()">רענון</button></div>
-<div id="appointmentsList">טוען...</div>
-</section>
-
-<section id="tab-availability" class="card hidden">
-<h2>הוספת שעה פנויה</h2>
-<div class="grid">
-  <div><label for="aStart">תחילת תור</label><input id="aStart" type="datetime-local"></div>
-  <div><label for="aEnd">סיום תור</label><input id="aEnd" type="datetime-local"></div>
-</div>
-<button onclick="addAvailability()">הוספת שעה פנויה</button>
-<h3>שעות פתוחות</h3><div id="availabilityList">טוען...</div>
-</section>
-
-<section id="tab-tools" class="card hidden">
-<h2>הוספת ציוד</h2>
-<div class="grid">
-  <div><label for="toolName">שם הפריט</label><input id="toolName" maxlength="120"></div>
-  <div><label for="toolCode">מספר מזהה</label><input id="toolCode" maxlength="80"></div>
-  <div><label for="toolCondition">מצב</label><select id="toolCondition"><option>תקין</option><option>דורש בדיקה</option><option>תקול</option></select></div>
-</div>
-<button onclick="addTool()">שמירת פריט</button>
-<h3>מלאי</h3><div id="toolsList">טוען...</div>
-<hr>
-<h2>רישום השאלה</h2>
-<div class="grid">
-  <div><label for="loanTool">פריט</label><select id="loanTool"></select></div>
-  <div><label for="loanName">שם השואל</label><input id="loanName" maxlength="100"></div>
-  <div><label for="loanPhone">טלפון</label><input id="loanPhone" maxlength="30"></div>
-  <div><label for="loanReason">סיבה</label><input id="loanReason" maxlength="200"></div>
-  <div><label for="loanDue">תאריך החזרה מתוכנן</label><input id="loanDue" type="date"></div>
-</div>
-<button onclick="addLoan()">רישום השאלה</button>
-<h3>השאלות פתוחות</h3><div id="loansList">טוען...</div>
-</section>
-
-<section id="tab-checks" class="card hidden">
-<h2>רשימת בדיקה</h2>
-<label for="checkText">משימה</label><input id="checkText" maxlength="200">
-<button onclick="addCheck()">הוספת משימה</button>
-<div id="checksList">טוען...</div>
-</section>
-</section>
-
-<p class="muted small">אין להזין מידע מסווג, מבצעי או מידע צבאי רגיש.</p>
+<p class="muted">אין להזין מידע מסווג, מבצעי או מידע צבאי רגיש.</p>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -145,187 +126,102 @@ th{background:#f8fafc}
 const SUPABASE_URL = "https://fvtqcfkuouvlvzummsdu.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wSm_gL5Tis4mFM_OAjEcnw_31pHY9do";
 
+const $ = id => document.getElementById(id);
 let sb = null;
-let selectedSlot = null;
 let currentUser = null;
 
-const $ = id => document.getElementById(id);
+function ready() {
+  if (!window.supabase) {
+    msg('publicMsg', 'Supabase לא נטען. בדוק חיבור לאינטרנט.', true);
+    return false;
+  }
+  if (!sb) {
+    sb = window.supabase.createClient(
+      SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY
+    );
+  }
+  return true;
+}
 
-function message(id, text, error = false) {
+function msg(id, text, error = false) {
   const el = $(id);
-  if (!el) return;
   el.textContent = text;
   el.classList.remove('hidden', 'error', 'success');
   el.classList.add(error ? 'error' : 'success');
 }
 
-function ready() {
-  if (!window.supabase) {
-    message('publicMsg', 'ספריית Supabase לא נטענה. בדוק את החיבור לאינטרנט ורענן.', true);
-    message('authMsg', 'ספריית Supabase לא נטענה. בדוק את החיבור לאינטרנט ורענן.', true);
-    return false;
-  }
-
-  if (
-    !SUPABASE_URL.startsWith('https://') ||
-    !SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_')
-  ) {
-    message('publicMsg', 'כתובת הפרויקט או המפתח הציבורי אינם תקינים.', true);
-    message('authMsg', 'כתובת הפרויקט או המפתח הציבורי אינם תקינים.', true);
-    return false;
-  }
-
-  if (!sb) {
-    sb = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
-  }
-
-  return true;
-}
-
-function pretty(iso) {
-  return new Date(iso).toLocaleString('he-IL', {
-    dateStyle: 'short',
-    timeStyle: 'short'
-  });
-}
-
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;'
+    '&':'&amp;', '<':'&lt;', '>':'&gt;',
+    '"':'&quot;', "'":'&#39;'
   }[c]));
 }
 
-function showError(prefix, error) {
-  console.error(prefix, error);
-  return error?.message || 'שגיאה לא ידועה';
+function dateTime(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleString('he-IL');
 }
 
-const today = new Date();
-$('pDate').min = [
-  today.getFullYear(),
-  String(today.getMonth() + 1).padStart(2, '0'),
-  String(today.getDate()).padStart(2, '0')
-].join('-');
+async function loadTools() {
+  if (!ready()) return;
 
-$('pDate').addEventListener('change', loadPublicSlots);
+  const { data, error } = await sb.from('tools')
+    .select('id,name,tool_identifier,condition')
+    .order('name');
 
-async function loadPublicSlots() {
-  selectedSlot = null;
-  $('slots').innerHTML = '';
-
-  if (!$('pDate').value) {
-    $('slots').textContent = 'בחר תאריך כדי לראות שעות פנויות.';
+  if (error) {
+    $('tool').innerHTML = '<option value="">לא ניתן לטעון ציוד</option>';
+    msg('publicMsg', 'שגיאה בטעינת הציוד: ' + error.message, true);
     return;
   }
 
-  if (!ready()) return;
-
-  const date = $('pDate').value;
-  const from = new Date(date + 'T00:00:00').toISOString();
-  const to = new Date(
-    new Date(date + 'T00:00:00').getTime() + 86400000
-  ).toISOString();
-
-  try {
-    const { data, error } = await sb.from('availability')
-      .select('id,start_time,end_time')
-      .eq('is_open', true)
-      .gte('start_time', from)
-      .lt('start_time', to)
-      .order('start_time');
-
-    if (error) {
-      console.error('Load public slots:', error);
-      $('slots').textContent = 'לא ניתן לטעון שעות פנויות. בדוק את הגדרות Supabase.';
-      return;
-    }
-
-    const slots = (data || []).filter(
-      s => new Date(s.start_time).getTime() > Date.now()
-    );
-
-    if (!slots.length) {
-      $('slots').textContent = 'אין שעות פנויות בתאריך הזה.';
-      return;
-    }
-
-    slots.forEach(s => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'slot';
-      b.textContent = new Date(s.start_time).toLocaleTimeString('he-IL', {
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-
-      b.onclick = () => {
-        selectedSlot = s.id;
-        document.querySelectorAll('.slot').forEach(
-          x => x.classList.remove('selected')
-        );
-        b.classList.add('selected');
-      };
-
-      $('slots').appendChild(b);
-    });
-  } catch (error) {
-    $('slots').textContent = 'שגיאה בטעינת השעות הפנויות.';
-    console.error(error);
-  }
+  $('tool').innerHTML = '<option value="">בחר כלי</option>' +
+    (data || []).map(t =>
+      `<option value="${esc(t.id)}">${esc(t.tool_identifier || 'ללא מספר')} — ${esc(t.name)}</option>`
+    ).join('');
 }
 
-async function bookPublic() {
+async function submitLoan() {
   if (!ready()) return;
 
-  const name = $('pName').value.trim();
-  const phone = $('pPhone').value.trim();
+  const tool_id = $('tool').value;
+  const borrower_name = $('borrower').value.trim();
+  const borrower_phone = $('phone').value.trim();
+  const reason = $('note').value.trim();
+  const due_date = $('due').value || null;
 
-  if (name.length < 2 || phone.length < 5 || !selectedSlot) {
-    message('publicMsg', 'מלא שם וטלפון ובחר שעה פנויה.', true);
+  if (!tool_id || borrower_name.length < 2) {
+    msg('publicMsg', 'בחר כלי והזן את שם הלוקח.', true);
     return;
   }
 
-  const button = $('bookBtn');
-  button.disabled = true;
+  const btn = $('submitBtn');
+  btn.disabled = true;
 
   try {
-    const { data, error } = await sb.rpc('book_appointment', {
-      p_slot_id: selectedSlot,
-      p_name: name,
-      p_phone: phone,
-      p_type: $('pType').value.trim() || null,
-      p_notes: $('pNotes').value.trim()
+    const { error } = await sb.from('tool_loans').insert({
+      tool_id,
+      borrower_name,
+      borrower_phone,
+      reason,
+      due_date
     });
 
     if (error) {
-      console.error('Book appointment:', error);
-      message('publicMsg', 'לא הצלחנו לקבוע את התור: ' + error.message, true);
+      msg('publicMsg', 'לא ניתן לשמור את הרישום: ' + error.message, true);
       return;
     }
 
-    if (data !== true) {
-      message('publicMsg', 'השעה כבר נתפסה. בחר שעה אחרת.', true);
-      await loadPublicSlots();
-      return;
-    }
-
-    message('publicMsg', 'התור נקבע בהצלחה.');
-    $('pName').value = '';
-    $('pPhone').value = '';
-    $('pType').value = '';
-    $('pNotes').value = '';
-    await loadPublicSlots();
-  } catch (error) {
-    message('publicMsg', 'שגיאה בקביעת התור: ' + showError('Book appointment', error), true);
+    msg('publicMsg', 'הרישום נשמר בהצלחה.');
+    $('tool').value = '';
+    $('borrower').value = '';
+    $('phone').value = '';
+    $('note').value = '';
+    $('due').value = '';
+  } catch (e) {
+    msg('publicMsg', 'שגיאה בשמירת הרישום: ' + e.message, true);
   } finally {
-    button.disabled = false;
+    btn.disabled = false;
   }
 }
 
@@ -336,394 +232,171 @@ async function login() {
   const password = $('password').value;
 
   if (!email || !password) {
-    message('authMsg', 'הזן אימייל וסיסמה.', true);
+    msg('authMsg', 'הזן אימייל וסיסמה.', true);
     return;
   }
 
-  const loginButton = $('loginBtn');
-  loginButton.disabled = true;
-  message('authMsg', 'מתחבר...', false);
+  $('loginBtn').disabled = true;
 
   try {
     const { data, error } = await sb.auth.signInWithPassword({
-      email,
-      password
+      email, password
     });
 
     if (error) {
-      message('authMsg', 'ההתחברות נכשלה: ' + error.message, true);
+      msg('authMsg', 'ההתחברות נכשלה: ' + error.message, true);
       return;
     }
 
     currentUser = data.user;
     await enterAdmin();
-  } catch (error) {
-    message('authMsg', 'שגיאה בהתחברות: ' + showError('Login error', error), true);
   } finally {
-    loginButton.disabled = false;
+    $('loginBtn').disabled = false;
   }
 }
 
 async function enterAdmin() {
-  if (!currentUser || !sb) return;
+  const { data, error } = await sb.from('admin_users')
+    .select('user_id')
+    .eq('user_id', currentUser.id)
+    .maybeSingle();
 
-  try {
-    const { data, error } = await sb.from('admin_users')
-      .select('user_id')
-      .eq('user_id', currentUser.id)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Check admin:', error);
-      message('authMsg', 'ההתחברות הצליחה, אבל בדיקת הרשאות הניהול נכשלה: ' + error.message, true);
-      return;
-    }
-
-    if (!data) {
-      await sb.auth.signOut();
-      currentUser = null;
-      message('authMsg', 'המשתמש הזה אינו מורשה לניהול.', true);
-      return;
-    }
-
-    $('adminArea').classList.remove('hidden');
-    $('logoutBtn').style.display = 'inline-block';
-    $('loginBtn').style.display = 'none';
-    $('loginBox').classList.add('hidden');
-    message('authMsg', 'מחובר למערכת הניהול.');
-
-    await loadAllAdmin();
-  } catch (error) {
-    message('authMsg', 'שגיאה בטעינת הניהול: ' + showError('Enter admin', error), true);
+  if (error) {
+    msg('authMsg', 'בדיקת הרשאות נכשלה: ' + error.message, true);
+    return;
   }
+
+  if (!data) {
+    await sb.auth.signOut();
+    currentUser = null;
+    msg('authMsg', 'אין למשתמש הרשאת מנהל.', true);
+    return;
+  }
+
+  $('adminArea').classList.remove('hidden');
+  $('loginBox').classList.add('hidden');
+  $('loginBtn').classList.add('hidden');
+  $('logoutBtn').classList.remove('hidden');
+  msg('authMsg', 'התחברת בהצלחה.');
+
+  await loadLoans();
+  await loadHistory();
 }
 
 async function logout() {
-  if (sb) {
-    const { error } = await sb.auth.signOut();
-    if (error) {
-      message('authMsg', 'לא ניתן להתנתק: ' + error.message, true);
-      return;
-    }
+  const { error } = await sb.auth.signOut();
+  if (error) {
+    msg('authMsg', 'שגיאה בהתנתקות: ' + error.message, true);
+    return;
   }
 
   currentUser = null;
   $('adminArea').classList.add('hidden');
-  $('logoutBtn').style.display = 'none';
-  $('loginBtn').style.display = 'inline-block';
   $('loginBox').classList.remove('hidden');
-  $('password').value = '';
-  message('authMsg', 'התנתקת מהמערכת.');
+  $('loginBtn').classList.remove('hidden');
+  $('logoutBtn').classList.add('hidden');
+  msg('authMsg', 'התנתקת.');
 }
 
-function showTab(name) {
-  document.querySelectorAll('[data-tab]').forEach(b => {
-    b.classList.toggle('active', b.dataset.tab === name);
-    b.classList.toggle('secondary', b.dataset.tab !== name);
-  });
+async function loadLoans() {
+  if (!currentUser) return;
 
-  ['appointments', 'availability', 'tools', 'checks'].forEach(n => {
-    $('tab-' + n).classList.toggle('hidden', n !== name);
-  });
-}
-
-async function loadAppointments() {
-  if (!sb) return;
-
-  const { data, error } = await sb.from('appointments').select('*')
-    .order('appointment_date').order('appointment_time');
-
-  if (error) {
-    console.error(error);
-    $('appointmentsList').textContent = 'לא ניתן לטעון תורים: ' + error.message;
-    return;
-  }
-
-  if (!data.length) {
-    $('appointmentsList').textContent = 'אין תורים כרגע.';
-    return;
-  }
-
-  $('appointmentsList').innerHTML =
-    '<div class="tablewrap"><table><thead><tr><th>תאריך</th><th>שעה</th><th>שם</th><th>טלפון</th><th>סוג</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>' +
-    data.map(a => `<tr>
-      <td>${esc(a.appointment_date)}</td>
-      <td>${esc(String(a.appointment_time).slice(0, 5))}</td>
-      <td>${esc(a.name)}</td>
-      <td>${esc(a.phone)}</td>
-      <td>${esc(a.appointment_type || '')}</td>
-      <td>${esc(a.status)}</td>
-      <td>
-        <button class="secondary" onclick="setAppointmentStatus('${a.id}','closed')">סיום</button>
-        <button class="danger" onclick="setAppointmentStatus('${a.id}','cancelled')">ביטול</button>
-      </td>
-    </tr>`).join('') +
-    '</tbody></table></div>';
-}
-
-async function setAppointmentStatus(id, status) {
-  const { error } = await sb.from('appointments')
-    .update({ status }).eq('id', id);
-
-  if (error) {
-    alert('לא ניתן לעדכן את התור: ' + error.message);
-    return;
-  }
-
-  await loadAppointments();
-}
-
-async function loadAvailability() {
-  const { data, error } = await sb.from('availability').select('*')
-    .eq('is_open', true).order('start_time');
-
-  if (error) {
-    $('availabilityList').textContent = 'לא ניתן לטעון שעות: ' + error.message;
-    return;
-  }
-
-  $('availabilityList').innerHTML = data.length
-    ? data.map(s => `<div class="item">
-        <strong>${esc(pretty(s.start_time))} – ${esc(pretty(s.end_time))}</strong>
-        <button class="danger" onclick="removeAvailability('${s.id}')">הסרה</button>
-      </div>`).join('')
-    : 'אין שעות פתוחות.';
-}
-
-async function addAvailability() {
-  const start = $('aStart').value;
-  const end = $('aEnd').value;
-
-  if (!start || !end || new Date(end) <= new Date(start)) {
-    alert('בחר שעת התחלה וסיום תקינות.');
-    return;
-  }
-
-  const { error } = await sb.from('availability').insert({
-    start_time: new Date(start).toISOString(),
-    end_time: new Date(end).toISOString(),
-    is_open: true
-  });
-
-  if (error) {
-    alert('לא ניתן להוסיף שעה: ' + error.message);
-    return;
-  }
-
-  $('aStart').value = '';
-  $('aEnd').value = '';
-  await loadAvailability();
-  await loadPublicSlots();
-}
-
-async function removeAvailability(id) {
-  const { error } = await sb.from('availability').delete().eq('id', id);
-
-  if (error) {
-    alert('לא ניתן להסיר את השעה: ' + error.message);
-    return;
-  }
-
-  await loadAvailability();
-  await loadPublicSlots();
-}
-
-async function loadTools() {
-  const { data, error } = await sb.from('tools').select('*').order('name');
-
-  if (error) {
-    $('toolsList').textContent = 'לא ניתן לטעון מלאי: ' + error.message;
-    return;
-  }
-
-  $('toolsList').innerHTML = data.length
-    ? data.map(t => `<div class="item">
-        <strong>${esc(t.name)} ${t.tool_identifier ? '· ' + esc(t.tool_identifier) : ''}</strong>
-        <span>${esc(t.condition)}</span>
-        <button class="danger" onclick="deleteTool('${t.id}')">מחיקת פריט</button>
-      </div>`).join('')
-    : 'אין פריטים במלאי.';
-
-  $('loanTool').innerHTML = '<option value="">בחר פריט</option>' +
-    data.map(t => `<option value="${t.id}">${esc(t.name)} ${esc(t.tool_identifier || '')}</option>`).join('');
-
-  const { data: loans, error: loanError } = await sb.from('tool_loans')
-    .select('*,tools(name,tool_identifier)')
+  const { data, error } = await sb.from('tool_loans')
+    .select('id,tool_id,borrower_name,borrower_phone,reason,due_date,created_at,tools(name,tool_identifier)')
     .is('returned_at', null)
     .order('created_at', { ascending: false });
 
-  if (loanError) {
-    $('loansList').textContent = 'לא ניתן לטעון השאלות: ' + loanError.message;
+  if (error) {
+    $('loansList').textContent = 'שגיאה בטעינת הרישומים: ' + error.message;
     return;
   }
 
-  $('loansList').innerHTML = loans.length
-    ? loans.map(l => `<div class="item">
-        <strong>${esc(l.tools?.name || 'פריט שנמחק')} · ${esc(l.borrower_name)}</strong>
-        <div>טלפון: ${esc(l.borrower_phone || '—')} · סיבה: ${esc(l.reason)} · החזרה: ${esc(l.due_date || 'לא צוין')}</div>
-        <button onclick="returnLoan('${l.id}')">סימון כהוחזר</button>
-      </div>`).join('')
-    : 'אין השאלות פתוחות.';
+  $('loansList').innerHTML = data.length ? data.map(l => `
+    <div class="item">
+      <strong>כלי ${esc(l.tools?.tool_identifier || 'ללא מספר')} — ${esc(l.tools?.name || '')}</strong>
+      <div>לוקח: ${esc(l.borrower_name)}</div>
+      <div>טלפון: ${esc(l.borrower_phone || '—')}</div>
+      <div>נרשם: ${esc(dateTime(l.created_at))}</div>
+      <div>החזרה מתוכננת: ${esc(l.due_date || 'לא צוין')}</div>
+      <p><b>הערה:</b> ${esc(l.reason || 'אין הערה')}</p>
+      <button class="danger" onclick="closeLoan('${l.id}')">סגירת רישום</button>
+    </div>
+  `).join('') : 'אין רישומים פתוחים.';
+}
+
+async function closeLoan(id) {
+  if (!confirm('לסגור את הרישום הזה?')) return;
+
+  const { error } = await sb.from('tool_loans')
+    .update({ returned_at: new Date().toISOString() })
+    .eq('id', id);
+
+  if (error) {
+    alert('לא ניתן לסגור את הרישום: ' + error.message);
+    return;
+  }
+
+  await loadLoans();
+  await loadHistory();
+}
+
+async function loadHistory() {
+  if (!currentUser) return;
+
+  const { data, error } = await sb.from('tool_loans')
+    .select('id,borrower_name,reason,returned_at,created_at,tools(name,tool_identifier)')
+    .not('returned_at', 'is', null)
+    .order('returned_at', { ascending: false })
+    .limit(100);
+
+  if (error) {
+    $('historyList').textContent = 'שגיאה בטעינת ההיסטוריה: ' + error.message;
+    return;
+  }
+
+  $('historyList').innerHTML = data.length ? data.map(l => `
+    <div class="item">
+      <strong>כלי ${esc(l.tools?.tool_identifier || 'ללא מספר')} — ${esc(l.tools?.name || '')}</strong>
+      <div>לוקח: ${esc(l.borrower_name)}</div>
+      <div>נרשם: ${esc(dateTime(l.created_at))}</div>
+      <div>נסגר: ${esc(dateTime(l.returned_at))}</div>
+      <p><b>הערה:</b> ${esc(l.reason || 'אין הערה')}</p>
+    </div>
+  `).join('') : 'אין רישומים סגורים.';
 }
 
 async function addTool() {
-  const name = $('toolName').value.trim();
+  const name = $('newTool').value.trim();
+  const tool_identifier = $('newCode').value.trim();
 
-  if (!name) {
-    alert('צריך להזין שם פריט.');
+  if (!name || !tool_identifier) {
+    alert('הזן שם כלי ומספר מזהה.');
     return;
   }
 
   const { error } = await sb.from('tools').insert({
-    name,
-    tool_identifier: $('toolCode').value.trim(),
-    condition: $('toolCondition').value
+    name, tool_identifier, condition: 'תקין'
   });
 
   if (error) {
-    alert('לא ניתן לשמור פריט: ' + error.message);
+    alert('לא ניתן להוסיף כלי: ' + error.message);
     return;
   }
 
-  $('toolName').value = '';
-  $('toolCode').value = '';
+  $('newTool').value = '';
+  $('newCode').value = '';
   await loadTools();
-}
-
-async function deleteTool(id) {
-  if (!confirm('למחוק את הפריט?')) return;
-
-  const { error } = await sb.from('tools').delete().eq('id', id);
-
-  if (error) {
-    alert('לא ניתן למחוק פריט: ' + error.message);
-    return;
-  }
-
-  await loadTools();
-}
-
-async function addLoan() {
-  const tool_id = $('loanTool').value;
-  const borrower_name = $('loanName').value.trim();
-  const reason = $('loanReason').value.trim();
-
-  if (!tool_id || !borrower_name || !reason) {
-    alert('בחר פריט והזן שם וסיבה.');
-    return;
-  }
-
-  const { error } = await sb.from('tool_loans').insert({
-    tool_id,
-    borrower_name,
-    borrower_phone: $('loanPhone').value.trim(),
-    reason,
-    due_date: $('loanDue').value || null
-  });
-
-  if (error) {
-    alert('לא ניתן לרשום השאלה: ' + error.message);
-    return;
-  }
-
-  $('loanName').value = '';
-  $('loanPhone').value = '';
-  $('loanReason').value = '';
-  $('loanDue').value = '';
-  await loadTools();
-}
-
-async function returnLoan(id) {
-  const { error } = await sb.from('tool_loans')
-    .update({ returned_at: new Date().toISOString() }).eq('id', id);
-
-  if (error) {
-    alert('לא ניתן לסמן כהוחזר: ' + error.message);
-    return;
-  }
-
-  await loadTools();
-}
-
-async function loadChecks() {
-  const { data, error } = await sb.from('checks').select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    $('checksList').textContent = 'לא ניתן לטעון רשימת בדיקה: ' + error.message;
-    return;
-  }
-
-  $('checksList').innerHTML = data.length
-    ? data.map(c => `<div class="item">
-        <label><input type="checkbox" style="width:auto" ${c.done ? 'checked' : ''} onchange="toggleCheck('${c.id}',this.checked)"> ${esc(c.task)}</label>
-        <button class="danger" onclick="deleteCheck('${c.id}')">מחיקה</button>
-      </div>`).join('')
-    : 'אין משימות.';
-}
-
-async function addCheck() {
-  const task = $('checkText').value.trim();
-
-  if (!task) {
-    alert('כתוב משימה.');
-    return;
-  }
-
-  const { error } = await sb.from('checks').insert({ task });
-
-  if (error) {
-    alert('לא ניתן להוסיף משימה: ' + error.message);
-    return;
-  }
-
-  $('checkText').value = '';
-  await loadChecks();
-}
-
-async function toggleCheck(id, done) {
-  const { error } = await sb.from('checks').update({ done }).eq('id', id);
-  if (error) alert('לא ניתן לעדכן משימה: ' + error.message);
-}
-
-async function deleteCheck(id) {
-  const { error } = await sb.from('checks').delete().eq('id', id);
-
-  if (error) {
-    alert('לא ניתן למחוק משימה: ' + error.message);
-    return;
-  }
-
-  await loadChecks();
-}
-
-async function loadAllAdmin() {
-  await Promise.all([
-    loadAppointments(),
-    loadAvailability(),
-    loadTools(),
-    loadChecks()
-  ]);
+  alert('הכלי נוסף בהצלחה.');
 }
 
 (async function init() {
   if (!ready()) return;
+  await loadTools();
 
-  try {
-    const { data, error } = await sb.auth.getSession();
-
-    if (error) {
-      console.error('Session check:', error);
-      return;
-    }
-
-    if (data.session) {
-      currentUser = data.session.user;
-      await enterAdmin();
-    }
-  } catch (error) {
-    console.error('Initialization error:', error);
-    message('authMsg', 'לא ניתן לאתחל את המערכת: ' + (error.message || 'שגיאה לא ידועה'), true);
+  const { data, error } = await sb.auth.getSession();
+  if (!error && data.session) {
+    currentUser = data.session.user;
+    await enterAdmin();
   }
 })();
 </script>
