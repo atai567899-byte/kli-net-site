@@ -16,6 +16,7 @@ input,select,textarea,button{font:inherit}
 input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:9px}
 textarea{min-height:70px}
 button{border:0;border-radius:9px;padding:11px 15px;background:#1763bd;color:white;cursor:pointer;font-weight:bold;margin-top:12px}
+button:disabled{opacity:.55;cursor:wait}
 button.secondary{background:#e6edf6;color:#17324f}
 button.danger{background:#b42318}
 .hidden{display:none!important}
@@ -139,6 +140,7 @@ th{background:#f8fafc}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+'use strict';
 
 const SUPABASE_URL = "https://fvtqcfkuouvlvzummsdu.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_wSm_gL5Tis4mFM_OAjEcnw_31pHY9do";
@@ -148,21 +150,26 @@ let selectedSlot = null;
 let currentUser = null;
 
 const $ = id => document.getElementById(id);
-function message(id,text,error=false){
-  const el=$(id);
-  el.textContent=text;
-  el.classList.remove('hidden','error','success');
-  el.classList.add(error?'error':'success');
+
+function message(id, text, error = false) {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = text;
+  el.classList.remove('hidden', 'error', 'success');
+  el.classList.add(error ? 'error' : 'success');
 }
 
 function ready() {
   if (!window.supabase) {
-    message('publicMsg', 'ספריית Supabase לא נטענה.', true);
-    message('authMsg', 'ספריית Supabase לא נטענה.', true);
+    message('publicMsg', 'ספריית Supabase לא נטענה. בדוק את החיבור לאינטרנט ורענן.', true);
+    message('authMsg', 'ספריית Supabase לא נטענה. בדוק את החיבור לאינטרנט ורענן.', true);
     return false;
   }
 
-  if (!SUPABASE_URL.startsWith('https://') || !SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_')) {
+  if (
+    !SUPABASE_URL.startsWith('https://') ||
+    !SUPABASE_PUBLISHABLE_KEY.startsWith('sb_publishable_')
+  ) {
     message('publicMsg', 'כתובת הפרויקט או המפתח הציבורי אינם תקינים.', true);
     message('authMsg', 'כתובת הפרויקט או המפתח הציבורי אינם תקינים.', true);
     return false;
@@ -177,128 +184,167 @@ function ready() {
 
   return true;
 }
+
+function pretty(iso) {
+  return new Date(iso).toLocaleString('he-IL', {
+    dateStyle: 'short',
+    timeStyle: 'short'
+  });
 }
 
-function pretty(iso){
-  return new Date(iso).toLocaleString('he-IL',{dateStyle:'short',timeStyle:'short'});
-}
-
-function esc(s){
-  return String(s??'').replace(/[&<>"']/g,c=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
   }[c]));
 }
 
-const today=new Date();
-$('pDate').min=[
+function showError(prefix, error) {
+  console.error(prefix, error);
+  return error?.message || 'שגיאה לא ידועה';
+}
+
+const today = new Date();
+$('pDate').min = [
   today.getFullYear(),
-  String(today.getMonth()+1).padStart(2,'0'),
-  String(today.getDate()).padStart(2,'0')
+  String(today.getMonth() + 1).padStart(2, '0'),
+  String(today.getDate()).padStart(2, '0')
 ].join('-');
 
-$('pDate').addEventListener('change',loadPublicSlots);
+$('pDate').addEventListener('change', loadPublicSlots);
 
-async function loadPublicSlots(){
-  selectedSlot=null;
-  $('slots').innerHTML='';
-  if(!$('pDate').value){
-    $('slots').textContent='בחר תאריך כדי לראות שעות פנויות.';
-    return;
-  }
-  if(!ready()) return;
+async function loadPublicSlots() {
+  selectedSlot = null;
+  $('slots').innerHTML = '';
 
-  const date=$('pDate').value;
-  const from=new Date(date+'T00:00:00').toISOString();
-  const to=new Date(new Date(date+'T00:00:00').getTime()+86400000).toISOString();
-
-  const {data,error}=await sb.from('availability')
-    .select('id,start_time,end_time')
-    .eq('is_open',true)
-    .gte('start_time',from)
-    .lt('start_time',to)
-    .order('start_time');
-
-  if(error){
-    $('slots').textContent='לא ניתן לטעון שעות פנויות. בדוק את הגדרות Supabase.';
+  if (!$('pDate').value) {
+    $('slots').textContent = 'בחר תאריך כדי לראות שעות פנויות.';
     return;
   }
 
-  const slots=(data||[]).filter(s=>new Date(s.start_time).getTime()>Date.now());
-  if(!slots.length){
-    $('slots').textContent='אין שעות פנויות בתאריך הזה.';
-    return;
-  }
+  if (!ready()) return;
 
-  slots.forEach(s=>{
-    const b=document.createElement('button');
-    b.className='slot';
-    b.textContent=new Date(s.start_time).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
-    b.onclick=()=>{
-      selectedSlot=s.id;
-      document.querySelectorAll('.slot').forEach(x=>x.classList.remove('selected'));
-      b.classList.add('selected');
-    };
-    $('slots').appendChild(b);
-  });
-}
-
-async function bookPublic(){
-  if(!ready()) return;
-  const name=$('pName').value.trim();
-  const phone=$('pPhone').value.trim();
-
-  if(name.length<2 || phone.length<5 || !selectedSlot){
-    message('publicMsg','מלא שם וטלפון ובחר שעה פנויה.',true);
-    return;
-  }
-
-  $('bookBtn').disabled=true;
-  const {data,error}=await sb.rpc('book_appointment',{
-    p_slot_id:selectedSlot,
-    p_name:name,
-    p_phone:phone,
-    p_type:$('pType').value.trim()||null,
-    p_notes:$('pNotes').value.trim()
-  });
-  $('bookBtn').disabled=false;
-
-  if(error){
-    message('publicMsg','לא הצלחנו לקבוע את התור. בדוק שהגדרות Supabase הושלמו.',true);
-    return;
-  }
-  if(data!==true){
-    message('publicMsg','השעה כבר נתפסה. בחר שעה אחרת.',true);
-    await loadPublicSlots();
-    return;
-  }
-
-  message('publicMsg','התור נקבע בהצלחה.');
-  $('pName').value='';
-  $('pPhone').value='';
-  $('pType').value='';
-  $('pNotes').value='';
-  await loadPublicSlots();
-}
-
-async function login() {
-  const authMsg = $('authMsg');
+  const date = $('pDate').value;
+  const from = new Date(date + 'T00:00:00').toISOString();
+  const to = new Date(
+    new Date(date + 'T00:00:00').getTime() + 86400000
+  ).toISOString();
 
   try {
-    if (!ready()) return;
+    const { data, error } = await sb.from('availability')
+      .select('id,start_time,end_time')
+      .eq('is_open', true)
+      .gte('start_time', from)
+      .lt('start_time', to)
+      .order('start_time');
 
-    const email = $('email').value.trim();
-    const password = $('password').value;
-
-    if (!email || !password) {
-      message('authMsg', 'הזן אימייל וסיסמה.', true);
+    if (error) {
+      console.error('Load public slots:', error);
+      $('slots').textContent = 'לא ניתן לטעון שעות פנויות. בדוק את הגדרות Supabase.';
       return;
     }
 
-    const loginButton = $('loginBtn');
-    if (loginButton) loginButton.disabled = true;
+    const slots = (data || []).filter(
+      s => new Date(s.start_time).getTime() > Date.now()
+    );
 
-    message('authMsg', 'מתחבר...', false);
+    if (!slots.length) {
+      $('slots').textContent = 'אין שעות פנויות בתאריך הזה.';
+      return;
+    }
 
+    slots.forEach(s => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'slot';
+      b.textContent = new Date(s.start_time).toLocaleTimeString('he-IL', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      b.onclick = () => {
+        selectedSlot = s.id;
+        document.querySelectorAll('.slot').forEach(
+          x => x.classList.remove('selected')
+        );
+        b.classList.add('selected');
+      };
+
+      $('slots').appendChild(b);
+    });
+  } catch (error) {
+    $('slots').textContent = 'שגיאה בטעינת השעות הפנויות.';
+    console.error(error);
+  }
+}
+
+async function bookPublic() {
+  if (!ready()) return;
+
+  const name = $('pName').value.trim();
+  const phone = $('pPhone').value.trim();
+
+  if (name.length < 2 || phone.length < 5 || !selectedSlot) {
+    message('publicMsg', 'מלא שם וטלפון ובחר שעה פנויה.', true);
+    return;
+  }
+
+  const button = $('bookBtn');
+  button.disabled = true;
+
+  try {
+    const { data, error } = await sb.rpc('book_appointment', {
+      p_slot_id: selectedSlot,
+      p_name: name,
+      p_phone: phone,
+      p_type: $('pType').value.trim() || null,
+      p_notes: $('pNotes').value.trim()
+    });
+
+    if (error) {
+      console.error('Book appointment:', error);
+      message('publicMsg', 'לא הצלחנו לקבוע את התור: ' + error.message, true);
+      return;
+    }
+
+    if (data !== true) {
+      message('publicMsg', 'השעה כבר נתפסה. בחר שעה אחרת.', true);
+      await loadPublicSlots();
+      return;
+    }
+
+    message('publicMsg', 'התור נקבע בהצלחה.');
+    $('pName').value = '';
+    $('pPhone').value = '';
+    $('pType').value = '';
+    $('pNotes').value = '';
+    await loadPublicSlots();
+  } catch (error) {
+    message('publicMsg', 'שגיאה בקביעת התור: ' + showError('Book appointment', error), true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function login() {
+  if (!ready()) return;
+
+  const email = $('email').value.trim();
+  const password = $('password').value;
+
+  if (!email || !password) {
+    message('authMsg', 'הזן אימייל וסיסמה.', true);
+    return;
+  }
+
+  const loginButton = $('loginBtn');
+  loginButton.disabled = true;
+  message('authMsg', 'מתחבר...', false);
+
+  try {
     const { data, error } = await sb.auth.signInWithPassword({
       email,
       password
@@ -311,238 +357,373 @@ async function login() {
 
     currentUser = data.user;
     await enterAdmin();
-
   } catch (error) {
-    console.error('Login error:', error);
-    message(
-      'authMsg',
-      'שגיאה בהתחברות: ' + (error.message || 'שגיאה לא ידועה'),
-      true
-    );
+    message('authMsg', 'שגיאה בהתחברות: ' + showError('Login error', error), true);
   } finally {
-    const loginButton = $('loginBtn');
-    if (loginButton) loginButton.disabled = false;
+    loginButton.disabled = false;
   }
 }
 
-async function enterAdmin(){
-  const {data,error}=await sb.from('admin_users')
-    .select('user_id').eq('user_id',currentUser.id).maybeSingle();
+async function enterAdmin() {
+  if (!currentUser || !sb) return;
 
-  if(error||!data){
-    await sb.auth.signOut();
-    currentUser=null;
-    message('authMsg','המשתמש הזה אינו מורשה לניהול.',true);
+  try {
+    const { data, error } = await sb.from('admin_users')
+      .select('user_id')
+      .eq('user_id', currentUser.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Check admin:', error);
+      message('authMsg', 'ההתחברות הצליחה, אבל בדיקת הרשאות הניהול נכשלה: ' + error.message, true);
+      return;
+    }
+
+    if (!data) {
+      await sb.auth.signOut();
+      currentUser = null;
+      message('authMsg', 'המשתמש הזה אינו מורשה לניהול.', true);
+      return;
+    }
+
+    $('adminArea').classList.remove('hidden');
+    $('logoutBtn').style.display = 'inline-block';
+    $('loginBtn').style.display = 'none';
+    $('loginBox').classList.add('hidden');
+    message('authMsg', 'מחובר למערכת הניהול.');
+
+    await loadAllAdmin();
+  } catch (error) {
+    message('authMsg', 'שגיאה בטעינת הניהול: ' + showError('Enter admin', error), true);
+  }
+}
+
+async function logout() {
+  if (sb) {
+    const { error } = await sb.auth.signOut();
+    if (error) {
+      message('authMsg', 'לא ניתן להתנתק: ' + error.message, true);
+      return;
+    }
+  }
+
+  currentUser = null;
+  $('adminArea').classList.add('hidden');
+  $('logoutBtn').style.display = 'none';
+  $('loginBtn').style.display = 'inline-block';
+  $('loginBox').classList.remove('hidden');
+  $('password').value = '';
+  message('authMsg', 'התנתקת מהמערכת.');
+}
+
+function showTab(name) {
+  document.querySelectorAll('[data-tab]').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === name);
+    b.classList.toggle('secondary', b.dataset.tab !== name);
+  });
+
+  ['appointments', 'availability', 'tools', 'checks'].forEach(n => {
+    $('tab-' + n).classList.toggle('hidden', n !== name);
+  });
+}
+
+async function loadAppointments() {
+  if (!sb) return;
+
+  const { data, error } = await sb.from('appointments').select('*')
+    .order('appointment_date').order('appointment_time');
+
+  if (error) {
+    console.error(error);
+    $('appointmentsList').textContent = 'לא ניתן לטעון תורים: ' + error.message;
     return;
   }
 
-  $('adminArea').classList.remove('hidden');
-  $('logoutBtn').style.display='inline-block';
-  $('loginBtn').style.display='none';
-  $('loginBox').classList.add('hidden');
-  message('authMsg','מחובר למערכת הניהול.');
-  await loadAllAdmin();
-}
+  if (!data.length) {
+    $('appointmentsList').textContent = 'אין תורים כרגע.';
+    return;
+  }
 
-async function logout(){
-  if(sb) await sb.auth.signOut();
-  currentUser=null;
-  $('adminArea').classList.add('hidden');
-  $('logoutBtn').style.display='none';
-  $('loginBtn').style.display='inline-block';
-  $('loginBox').classList.remove('hidden');
-}
-
-function showTab(name){
-  document.querySelectorAll('[data-tab]').forEach(b=>{
-    b.classList.toggle('active',b.dataset.tab===name);
-    b.classList.toggle('secondary',b.dataset.tab!==name);
-  });
-  ['appointments','availability','tools','checks'].forEach(n=>{
-    $('tab-'+n).classList.toggle('hidden',n!==name);
-  });
-}
-
-async function loadAppointments(){
-  const {data,error}=await sb.from('appointments').select('*')
-    .order('appointment_date').order('appointment_time');
-
-  if(error){$('appointmentsList').textContent='לא ניתן לטעון תורים.';return;}
-  if(!data.length){$('appointmentsList').textContent='אין תורים כרגע.';return;}
-
-  $('appointmentsList').innerHTML='<div class="tablewrap"><table><thead><tr><th>תאריך</th><th>שעה</th><th>שם</th><th>טלפון</th><th>סוג</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>'+
-    data.map(a=>`<tr>
+  $('appointmentsList').innerHTML =
+    '<div class="tablewrap"><table><thead><tr><th>תאריך</th><th>שעה</th><th>שם</th><th>טלפון</th><th>סוג</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody>' +
+    data.map(a => `<tr>
       <td>${esc(a.appointment_date)}</td>
-      <td>${esc(String(a.appointment_time).slice(0,5))}</td>
-      <td>${esc(a.name)}</td><td>${esc(a.phone)}</td>
-      <td>${esc(a.appointment_type||'')}</td><td>${esc(a.status)}</td>
-      <td><button class="secondary" onclick="setAppointmentStatus('${a.id}','closed')">סיום</button>
-      <button class="danger" onclick="setAppointmentStatus('${a.id}','cancelled')">ביטול</button></td>
-    </tr>`).join('')+'</tbody></table></div>';
+      <td>${esc(String(a.appointment_time).slice(0, 5))}</td>
+      <td>${esc(a.name)}</td>
+      <td>${esc(a.phone)}</td>
+      <td>${esc(a.appointment_type || '')}</td>
+      <td>${esc(a.status)}</td>
+      <td>
+        <button class="secondary" onclick="setAppointmentStatus('${a.id}','closed')">סיום</button>
+        <button class="danger" onclick="setAppointmentStatus('${a.id}','cancelled')">ביטול</button>
+      </td>
+    </tr>`).join('') +
+    '</tbody></table></div>';
 }
 
-async function setAppointmentStatus(id,status){
-  const {error}=await sb.from('appointments').update({status}).eq('id',id);
-  if(error){alert('לא ניתן לעדכן את התור.');return;}
+async function setAppointmentStatus(id, status) {
+  const { error } = await sb.from('appointments')
+    .update({ status }).eq('id', id);
+
+  if (error) {
+    alert('לא ניתן לעדכן את התור: ' + error.message);
+    return;
+  }
+
   await loadAppointments();
 }
 
-async function loadAvailability(){
-  const {data,error}=await sb.from('availability').select('*')
-    .eq('is_open',true).order('start_time');
+async function loadAvailability() {
+  const { data, error } = await sb.from('availability').select('*')
+    .eq('is_open', true).order('start_time');
 
-  if(error){$('availabilityList').textContent='לא ניתן לטעון שעות.';return;}
-  $('availabilityList').innerHTML=data.length
-    ?data.map(s=>`<div class="item"><strong>${esc(pretty(s.start_time))} – ${esc(pretty(s.end_time))}</strong><button class="danger" onclick="removeAvailability('${s.id}')">הסרה</button></div>`).join('')
-    :'אין שעות פתוחות.';
+  if (error) {
+    $('availabilityList').textContent = 'לא ניתן לטעון שעות: ' + error.message;
+    return;
+  }
+
+  $('availabilityList').innerHTML = data.length
+    ? data.map(s => `<div class="item">
+        <strong>${esc(pretty(s.start_time))} – ${esc(pretty(s.end_time))}</strong>
+        <button class="danger" onclick="removeAvailability('${s.id}')">הסרה</button>
+      </div>`).join('')
+    : 'אין שעות פתוחות.';
 }
 
-async function addAvailability(){
-  const start=$('aStart').value,end=$('aEnd').value;
-  if(!start||!end||new Date(end)<=new Date(start)){
+async function addAvailability() {
+  const start = $('aStart').value;
+  const end = $('aEnd').value;
+
+  if (!start || !end || new Date(end) <= new Date(start)) {
     alert('בחר שעת התחלה וסיום תקינות.');
     return;
   }
 
-  const {error}=await sb.from('availability').insert({
-    start_time:new Date(start).toISOString(),
-    end_time:new Date(end).toISOString(),
-    is_open:true
+  const { error } = await sb.from('availability').insert({
+    start_time: new Date(start).toISOString(),
+    end_time: new Date(end).toISOString(),
+    is_open: true
   });
 
-  if(error){alert('לא ניתן להוסיף שעה. בדוק את הגדרות Supabase.');return;}
-  $('aStart').value='';$('aEnd').value='';
+  if (error) {
+    alert('לא ניתן להוסיף שעה: ' + error.message);
+    return;
+  }
+
+  $('aStart').value = '';
+  $('aEnd').value = '';
   await loadAvailability();
   await loadPublicSlots();
 }
 
-async function removeAvailability(id){
-  const {error}=await sb.from('availability').delete().eq('id',id);
-  if(error){alert('לא ניתן להסיר את השעה.');return;}
+async function removeAvailability(id) {
+  const { error } = await sb.from('availability').delete().eq('id', id);
+
+  if (error) {
+    alert('לא ניתן להסיר את השעה: ' + error.message);
+    return;
+  }
+
   await loadAvailability();
   await loadPublicSlots();
 }
 
-async function loadTools(){
-  const {data,error}=await sb.from('tools').select('*').order('name');
-  if(error){$('toolsList').textContent='לא ניתן לטעון מלאי.';return;}
+async function loadTools() {
+  const { data, error } = await sb.from('tools').select('*').order('name');
 
-  $('toolsList').innerHTML=data.length
-    ?data.map(t=>`<div class="item"><strong>${esc(t.name)} ${t.tool_identifier?'· '+esc(t.tool_identifier):''}</strong><span>${esc(t.condition)}</span> <button class="danger" onclick="deleteTool('${t.id}')">מחיקת פריט</button></div>`).join('')
-    :'אין פריטים במלאי.';
+  if (error) {
+    $('toolsList').textContent = 'לא ניתן לטעון מלאי: ' + error.message;
+    return;
+  }
 
-  $('loanTool').innerHTML='<option value="">בחר פריט</option>'+
-    data.map(t=>`<option value="${t.id}">${esc(t.name)} ${esc(t.tool_identifier||'')}</option>`).join('');
+  $('toolsList').innerHTML = data.length
+    ? data.map(t => `<div class="item">
+        <strong>${esc(t.name)} ${t.tool_identifier ? '· ' + esc(t.tool_identifier) : ''}</strong>
+        <span>${esc(t.condition)}</span>
+        <button class="danger" onclick="deleteTool('${t.id}')">מחיקת פריט</button>
+      </div>`).join('')
+    : 'אין פריטים במלאי.';
 
-  const {data:loans,error:loanError}=await sb.from('tool_loans')
-    .select('*,tools(name,tool_identifier)').is('returned_at',null)
-    .order('created_at',{ascending:false});
+  $('loanTool').innerHTML = '<option value="">בחר פריט</option>' +
+    data.map(t => `<option value="${t.id}">${esc(t.name)} ${esc(t.tool_identifier || '')}</option>`).join('');
 
-  if(loanError){$('loansList').textContent='לא ניתן לטעון השאלות.';return;}
+  const { data: loans, error: loanError } = await sb.from('tool_loans')
+    .select('*,tools(name,tool_identifier)')
+    .is('returned_at', null)
+    .order('created_at', { ascending: false });
 
-  $('loansList').innerHTML=loans.length
-    ?loans.map(l=>`<div class="item"><strong>${esc(l.tools?.name||'פריט שנמחק')} · ${esc(l.borrower_name)}</strong>
-      <div>טלפון: ${esc(l.borrower_phone||'—')} · סיבה: ${esc(l.reason)} · החזרה: ${esc(l.due_date||'לא צוין')}</div>
-      <button onclick="returnLoan('${l.id}')">סימון כהוחזר</button></div>`).join('')
-    :'אין השאלות פתוחות.';
+  if (loanError) {
+    $('loansList').textContent = 'לא ניתן לטעון השאלות: ' + loanError.message;
+    return;
+  }
+
+  $('loansList').innerHTML = loans.length
+    ? loans.map(l => `<div class="item">
+        <strong>${esc(l.tools?.name || 'פריט שנמחק')} · ${esc(l.borrower_name)}</strong>
+        <div>טלפון: ${esc(l.borrower_phone || '—')} · סיבה: ${esc(l.reason)} · החזרה: ${esc(l.due_date || 'לא צוין')}</div>
+        <button onclick="returnLoan('${l.id}')">סימון כהוחזר</button>
+      </div>`).join('')
+    : 'אין השאלות פתוחות.';
 }
 
-async function addTool(){
-  const name=$('toolName').value.trim();
-  if(!name){alert('צריך להזין שם פריט.');return;}
+async function addTool() {
+  const name = $('toolName').value.trim();
 
-  const {error}=await sb.from('tools').insert({
+  if (!name) {
+    alert('צריך להזין שם פריט.');
+    return;
+  }
+
+  const { error } = await sb.from('tools').insert({
     name,
-    tool_identifier:$('toolCode').value.trim(),
-    condition:$('toolCondition').value
+    tool_identifier: $('toolCode').value.trim(),
+    condition: $('toolCondition').value
   });
 
-  if(error){alert('לא ניתן לשמור פריט.');return;}
-  $('toolName').value='';$('toolCode').value='';
+  if (error) {
+    alert('לא ניתן לשמור פריט: ' + error.message);
+    return;
+  }
+
+  $('toolName').value = '';
+  $('toolCode').value = '';
   await loadTools();
 }
 
-async function deleteTool(id){
-  if(!confirm('למחוק את הפריט?'))return;
-  const {error}=await sb.from('tools').delete().eq('id',id);
-  if(error){alert('לא ניתן למחוק פריט שיש לו השאלה מקושרת.');return;}
+async function deleteTool(id) {
+  if (!confirm('למחוק את הפריט?')) return;
+
+  const { error } = await sb.from('tools').delete().eq('id', id);
+
+  if (error) {
+    alert('לא ניתן למחוק פריט: ' + error.message);
+    return;
+  }
+
   await loadTools();
 }
 
-async function addLoan(){
-  const tool_id=$('loanTool').value;
-  const borrower_name=$('loanName').value.trim();
-  const reason=$('loanReason').value.trim();
+async function addLoan() {
+  const tool_id = $('loanTool').value;
+  const borrower_name = $('loanName').value.trim();
+  const reason = $('loanReason').value.trim();
 
-  if(!tool_id||!borrower_name||!reason){
+  if (!tool_id || !borrower_name || !reason) {
     alert('בחר פריט והזן שם וסיבה.');
     return;
   }
 
-  const {error}=await sb.from('tool_loans').insert({
+  const { error } = await sb.from('tool_loans').insert({
     tool_id,
     borrower_name,
-    borrower_phone:$('loanPhone').value.trim(),
+    borrower_phone: $('loanPhone').value.trim(),
     reason,
-    due_date:$('loanDue').value||null
+    due_date: $('loanDue').value || null
   });
 
-  if(error){alert('לא ניתן לרשום השאלה.');return;}
-  $('loanName').value='';$('loanPhone').value='';
-  $('loanReason').value='';$('loanDue').value='';
+  if (error) {
+    alert('לא ניתן לרשום השאלה: ' + error.message);
+    return;
+  }
+
+  $('loanName').value = '';
+  $('loanPhone').value = '';
+  $('loanReason').value = '';
+  $('loanDue').value = '';
   await loadTools();
 }
 
-async function returnLoan(id){
-  const {error}=await sb.from('tool_loans')
-    .update({returned_at:new Date().toISOString()}).eq('id',id);
-  if(error){alert('לא ניתן לסמן כהוחזר.');return;}
+async function returnLoan(id) {
+  const { error } = await sb.from('tool_loans')
+    .update({ returned_at: new Date().toISOString() }).eq('id', id);
+
+  if (error) {
+    alert('לא ניתן לסמן כהוחזר: ' + error.message);
+    return;
+  }
+
   await loadTools();
 }
 
-async function loadChecks(){
-  const {data,error}=await sb.from('checks').select('*').order('created_at',{ascending:false});
-  if(error){$('checksList').textContent='לא ניתן לטעון רשימת בדיקה.';return;}
+async function loadChecks() {
+  const { data, error } = await sb.from('checks').select('*')
+    .order('created_at', { ascending: false });
 
-  $('checksList').innerHTML=data.length
-    ?data.map(c=>`<div class="item"><label><input type="checkbox" style="width:auto" ${c.done?'checked':''} onchange="toggleCheck('${c.id}',this.checked)"> ${esc(c.task)}</label><button class="danger" onclick="deleteCheck('${c.id}')">מחיקה</button></div>`).join('')
-    :'אין משימות.';
+  if (error) {
+    $('checksList').textContent = 'לא ניתן לטעון רשימת בדיקה: ' + error.message;
+    return;
+  }
+
+  $('checksList').innerHTML = data.length
+    ? data.map(c => `<div class="item">
+        <label><input type="checkbox" style="width:auto" ${c.done ? 'checked' : ''} onchange="toggleCheck('${c.id}',this.checked)"> ${esc(c.task)}</label>
+        <button class="danger" onclick="deleteCheck('${c.id}')">מחיקה</button>
+      </div>`).join('')
+    : 'אין משימות.';
 }
 
-async function addCheck(){
-  const task=$('checkText').value.trim();
-  if(!task){alert('כתוב משימה.');return;}
+async function addCheck() {
+  const task = $('checkText').value.trim();
 
-  const {error}=await sb.from('checks').insert({task});
-  if(error){alert('לא ניתן להוסיף משימה.');return;}
-  $('checkText').value='';
+  if (!task) {
+    alert('כתוב משימה.');
+    return;
+  }
+
+  const { error } = await sb.from('checks').insert({ task });
+
+  if (error) {
+    alert('לא ניתן להוסיף משימה: ' + error.message);
+    return;
+  }
+
+  $('checkText').value = '';
   await loadChecks();
 }
 
-async function toggleCheck(id,done){
-  const {error}=await sb.from('checks').update({done}).eq('id',id);
-  if(error)alert('לא ניתן לעדכן משימה.');
+async function toggleCheck(id, done) {
+  const { error } = await sb.from('checks').update({ done }).eq('id', id);
+  if (error) alert('לא ניתן לעדכן משימה: ' + error.message);
 }
 
-async function deleteCheck(id){
-  const {error}=await sb.from('checks').delete().eq('id',id);
-  if(error){alert('לא ניתן למחוק משימה.');return;}
+async function deleteCheck(id) {
+  const { error } = await sb.from('checks').delete().eq('id', id);
+
+  if (error) {
+    alert('לא ניתן למחוק משימה: ' + error.message);
+    return;
+  }
+
   await loadChecks();
 }
 
-async function loadAllAdmin(){
+async function loadAllAdmin() {
   await Promise.all([
-    loadAppointments(),loadAvailability(),loadTools(),loadChecks()
+    loadAppointments(),
+    loadAvailability(),
+    loadTools(),
+    loadChecks()
   ]);
 }
 
-(async()=>{
-  if(ready()){
-    const {data}=await sb.auth.getSession();
-    if(data.session){
-      currentUser=data.session.user;
+(async function init() {
+  if (!ready()) return;
+
+  try {
+    const { data, error } = await sb.auth.getSession();
+
+    if (error) {
+      console.error('Session check:', error);
+      return;
+    }
+
+    if (data.session) {
+      currentUser = data.session.user;
       await enterAdmin();
     }
+  } catch (error) {
+    console.error('Initialization error:', error);
+    message('authMsg', 'לא ניתן לאתחל את המערכת: ' + (error.message || 'שגיאה לא ידועה'), true);
   }
 })();
 </script>
